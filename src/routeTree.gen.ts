@@ -14,7 +14,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedScannerRouteImport } from './routes/_authenticated/scanner'
+import { Route as AuthenticatedReportRouteImport } from './routes/_authenticated/report'
 import { Route as AuthenticatedPrescriptionRouteImport } from './routes/_authenticated/prescription'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedDiaryRouteImport } from './routes/_authenticated/diary'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const SignupRoute = SignupRouteImport.update({
@@ -41,12 +44,27 @@ const AuthenticatedScannerRoute = AuthenticatedScannerRouteImport.update({
   path: '/scanner',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedReportRoute = AuthenticatedReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPrescriptionRoute =
   AuthenticatedPrescriptionRouteImport.update({
     id: '/prescription',
     path: '/prescription',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDiaryRoute = AuthenticatedDiaryRouteImport.update({
+  id: '/diary',
+  path: '/diary',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -58,7 +76,10 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/diary': typeof AuthenticatedDiaryRoute
+  '/history': typeof AuthenticatedHistoryRoute
   '/prescription': typeof AuthenticatedPrescriptionRoute
+  '/report': typeof AuthenticatedReportRoute
   '/scanner': typeof AuthenticatedScannerRoute
 }
 export interface FileRoutesByTo {
@@ -66,7 +87,10 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/diary': typeof AuthenticatedDiaryRoute
+  '/history': typeof AuthenticatedHistoryRoute
   '/prescription': typeof AuthenticatedPrescriptionRoute
+  '/report': typeof AuthenticatedReportRoute
   '/scanner': typeof AuthenticatedScannerRoute
 }
 export interface FileRoutesById {
@@ -76,7 +100,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/diary': typeof AuthenticatedDiaryRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/prescription': typeof AuthenticatedPrescriptionRoute
+  '/_authenticated/report': typeof AuthenticatedReportRoute
   '/_authenticated/scanner': typeof AuthenticatedScannerRoute
 }
 export interface FileRouteTypes {
@@ -86,10 +113,22 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard'
+    | '/diary'
+    | '/history'
     | '/prescription'
+    | '/report'
     | '/scanner'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/dashboard' | '/prescription' | '/scanner'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/dashboard'
+    | '/diary'
+    | '/history'
+    | '/prescription'
+    | '/report'
+    | '/scanner'
   id:
     | '__root__'
     | '/'
@@ -97,7 +136,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/_authenticated/dashboard'
+    | '/_authenticated/diary'
+    | '/_authenticated/history'
     | '/_authenticated/prescription'
+    | '/_authenticated/report'
     | '/_authenticated/scanner'
   fileRoutesById: FileRoutesById
 }
@@ -145,11 +187,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScannerRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/report': {
+      id: '/_authenticated/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof AuthenticatedReportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/prescription': {
       id: '/_authenticated/prescription'
       path: '/prescription'
       fullPath: '/prescription'
       preLoaderRoute: typeof AuthenticatedPrescriptionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/diary': {
+      id: '/_authenticated/diary'
+      path: '/diary'
+      fullPath: '/diary'
+      preLoaderRoute: typeof AuthenticatedDiaryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
@@ -164,13 +227,19 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiaryRoute: typeof AuthenticatedDiaryRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedPrescriptionRoute: typeof AuthenticatedPrescriptionRoute
+  AuthenticatedReportRoute: typeof AuthenticatedReportRoute
   AuthenticatedScannerRoute: typeof AuthenticatedScannerRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDiaryRoute: AuthenticatedDiaryRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedPrescriptionRoute: AuthenticatedPrescriptionRoute,
+  AuthenticatedReportRoute: AuthenticatedReportRoute,
   AuthenticatedScannerRoute: AuthenticatedScannerRoute,
 }
 

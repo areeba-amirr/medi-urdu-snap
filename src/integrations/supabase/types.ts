@@ -14,7 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      scans: {
+        Row: {
+          created_at: string
+          doctor_notes: string | null
+          doctor_notes_urdu: string | null
+          dosage: string | null
+          dosage_urdu: string | null
+          food_interactions: string | null
+          food_interactions_urdu: string | null
+          frequency: string | null
+          frequency_urdu: string | null
+          id: string
+          is_dangerous: boolean | null
+          medicine_name: string | null
+          medicine_name_urdu: string | null
+          prescription_data: Json | null
+          scan_type: string
+          user_id: string
+          warnings: string | null
+          warnings_urdu: string | null
+        }
+        Insert: {
+          created_at?: string
+          doctor_notes?: string | null
+          doctor_notes_urdu?: string | null
+          dosage?: string | null
+          dosage_urdu?: string | null
+          food_interactions?: string | null
+          food_interactions_urdu?: string | null
+          frequency?: string | null
+          frequency_urdu?: string | null
+          id?: string
+          is_dangerous?: boolean | null
+          medicine_name?: string | null
+          medicine_name_urdu?: string | null
+          prescription_data?: Json | null
+          scan_type?: string
+          user_id: string
+          warnings?: string | null
+          warnings_urdu?: string | null
+        }
+        Update: {
+          created_at?: string
+          doctor_notes?: string | null
+          doctor_notes_urdu?: string | null
+          dosage?: string | null
+          dosage_urdu?: string | null
+          food_interactions?: string | null
+          food_interactions_urdu?: string | null
+          frequency?: string | null
+          frequency_urdu?: string | null
+          id?: string
+          is_dangerous?: boolean | null
+          medicine_name?: string | null
+          medicine_name_urdu?: string | null
+          prescription_data?: Json | null
+          scan_type?: string
+          user_id?: string
+          warnings?: string | null
+          warnings_urdu?: string | null
+        }
+        Relationships: []
+      }
+      symptoms: {
+        Row: {
+          created_at: string
+          id: string
+          mood: string | null
+          notes: string | null
+          notes_urdu: string | null
+          pain_level: number | null
+          sleep_hours: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mood?: string | null
+          notes?: string | null
+          notes_urdu?: string | null
+          pain_level?: number | null
+          sleep_hours?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mood?: string | null
+          notes?: string | null
+          notes_urdu?: string | null
+          pain_level?: number | null
+          sleep_hours?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,0 +1,47 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ScanLine, FileText, Mic, FileBarChart, History, ArrowRight } from "lucide-react";
+
+export const Route = createFileRoute("/_authenticated/dashboard")({
+  component: Dashboard,
+});
+
+const TILES = [
+  { to: "/scanner", title: "Scan Medicine", desc: "Read any English label", urdu: "دوا اسکین کریں", icon: ScanLine, color: "from-primary to-primary/70" },
+  { to: "/prescription", title: "Scan Prescription", desc: "Decode doctor's handwriting", urdu: "نسخہ پڑھیں", icon: FileText, color: "from-success to-success/70" },
+  { to: "/diary", title: "Log Symptoms", desc: "Voice or text diary", urdu: "علامات لکھیں", icon: Mic, color: "from-warning to-warning/70" },
+  { to: "/report", title: "Generate Report", desc: "PDF for your doctor", urdu: "ڈاکٹر رپورٹ بنائیں", icon: FileBarChart, color: "from-destructive to-destructive/70" },
+] as const;
+
+function Dashboard() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Dashboard</h1>
+      <p className="mt-1 text-muted-foreground">Choose what you'd like to do.</p>
+
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        {TILES.map(({ to, title, desc, urdu, icon: Icon, color }) => (
+          <Link key={to} to={to} className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${color}`} />
+            <div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${color} text-primary-foreground`}>
+              <Icon className="h-6 w-6" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">{title}</h3>
+            <p className="text-sm text-muted-foreground">{desc}</p>
+            <p className="urdu mt-1 text-sm text-muted-foreground">{urdu}</p>
+            <ArrowRight className="absolute right-5 top-5 h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-10 grid gap-4 sm:grid-cols-2">
+        <Link to="/history" className="flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:bg-accent">
+          <div className="flex items-center gap-3"><History className="h-5 w-5 text-primary" /><span className="font-medium">View scan history</span></div>
+          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+        <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+          MediSnap is an AI assistant. Always consult a qualified doctor before changing medication.
+        </div>
+      </div>
+    </div>
+  );
+}

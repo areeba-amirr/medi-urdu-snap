@@ -96,12 +96,19 @@ export const scanMedicine = createServerFn({ method: "POST" })
       ? data.imageBase64
       : `data:image/jpeg;base64,${data.imageBase64}`;
 
+    const promptText = `You are an expert medical assistant. Look at this medicine label image very carefully. Read EVERY word on the label. Extract ALL of this information:
+- Medicine name (brand + generic)
+- Exact dosage (mg, ml etc)
+- How many times per day to take it
+- Before or after food instructions
+- All warnings and side effects
+- Food and drug interactions
+
+If you cannot read something clearly, make your best medical judgment based on the medicine name and type. NEVER return null or "not specified". Always provide medical information based on the medicine name even if label is unclear. Provide Urdu translations for every field. Set is_dangerous=true only for controlled substances, strong sedatives, or medicines requiring strict medical supervision.`;
+
     const result = await callAI({
       messages: [
-        {
-          role: "system",
-          content: "You are a medical assistant in Pakistan. Read medicine labels carefully and translate every field to clear, simple Urdu. If a field is not visible, write 'Not specified' in English and 'درج نہیں' in Urdu. Mark is_dangerous=true only if the medicine has serious warnings (controlled substance, strong sedative, dangerous interactions, requires strict medical supervision).",
-        },
+        { role: "system", content: promptText },
         {
           role: "user",
           content: [
@@ -120,7 +127,7 @@ export const scanMedicine = createServerFn({ method: "POST" })
       }],
       tool_choice: { type: "function", function: { name: "extract_medicine" } },
     });
-    return parseToolCall(result);
+    return applyMedicineFallbacks(parseToolCall(result));
   });
 
 const prescriptionSchema = {

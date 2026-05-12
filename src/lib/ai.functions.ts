@@ -148,9 +148,11 @@ const prescriptionSchema = {
           duration_urdu: { type: "string" },
           instructions: { type: "string" },
           instructions_urdu: { type: "string" },
+          warnings: { type: "string" },
+          warnings_urdu: { type: "string" },
           is_dangerous: { type: "boolean" },
         },
-        required: ["name","name_urdu","dosage","dosage_urdu","frequency","frequency_urdu","duration","duration_urdu","instructions","instructions_urdu","is_dangerous"],
+        required: ["name","name_urdu","dosage","dosage_urdu","frequency","frequency_urdu","duration","duration_urdu","instructions","instructions_urdu","warnings","warnings_urdu","is_dangerous"],
         additionalProperties: false,
       },
     },
@@ -163,6 +165,30 @@ const prescriptionSchema = {
   additionalProperties: false,
 };
 
+const PRESCRIPTION_MED_FIELDS = [
+  "name","name_urdu","dosage","dosage_urdu","frequency","frequency_urdu",
+  "duration","duration_urdu","instructions","instructions_urdu","warnings","warnings_urdu",
+] as const;
+
+function applyPrescriptionFallbacks(p: Record<string, any>) {
+  const out: Record<string, any> = { ...p };
+  out.medicines = Array.isArray(p.medicines) ? p.medicines.map((m: any) => {
+    const med: Record<string, any> = { ...m };
+    for (const k of PRESCRIPTION_MED_FIELDS) {
+      const v = med[k];
+      const empty = v === null || v === undefined || (typeof v === "string" && v.trim() === "");
+      if (empty) med[k] = k.endsWith("_urdu") ? "دستیاب نہیں" : "N/A";
+    }
+    med.is_dangerous = med.is_dangerous === true || String(med.is_dangerous).toLowerCase() === "true";
+    return med;
+  }) : [];
+  for (const k of ["doctor_notes","doctor_notes_urdu","interactions","interactions_urdu"]) {
+    const v = out[k];
+    if (v === null || v === undefined || (typeof v === "string" && v.trim() === "")) out[k] = "";
+  }
+  return out;
+}
+
 export const scanPrescription = createServerFn({ method: "POST" })
   .inputValidator((d: { imageBase64: string }) => z.object({ imageBase64: z.string().min(20) }).parse(d))
   .handler(async ({ data }) => {
@@ -170,12 +196,25 @@ export const scanPrescription = createServerFn({ method: "POST" })
       ? data.imageBase64
       : `data:image/jpeg;base64,${data.imageBase64}`;
 
+    const promptText = `You are an expert medical assistant in Pakistan. Read this doctor prescription carefully. It may be handwritten or printed.
+
+Decode ALL medical abbreviations:
+TDS = تین بار روزانہ (3 times daily)
+BD  = دو بار روزانہ (twice daily)
+OD  = ایک بار روزانہ (once daily)
+QID = 4 times daily
+PC  = کھانے کے بعد (after food)
+AC  = کھانے سے پہلے (before food)
+HS  = سونے سے پہلے (at bedtime)
+SOS = ضرورت پر (when needed)
+PRN = as required
+x7d = for 7 days
+
+Extract EVERY medicine with name, dosage, frequency, duration, instructions (before/after food), and warnings — all with Urdu translations. Note any dangerous drug interactions in the 'interactions' field. NEVER return empty fields. Use medical knowledge if the label is unclear.`;
+
     const result = await callAI({
       messages: [
-        {
-          role: "system",
-          content: "You are a medical assistant in Pakistan reading doctor prescriptions, often handwritten. Decode standard medical abbreviations: TDS=3 times daily (تین بار روزانہ), BD=twice daily (دو بار روزانہ), OD=once daily (ایک بار روزانہ), QID=4 times daily, PC=after food (کھانے کے بعد), AC=before food (کھانے سے پہلے), HS=at bedtime (سونے سے پہلے), SOS=as needed (ضرورت پڑنے پر), PRN=as required, x7d=for 7 days. Translate every field to simple Urdu. Note any drug interactions in 'interactions'. If nothing readable, return empty arrays/strings.",
-        },
+        { role: "system", content: promptText },
         {
           role: "user",
           content: [
@@ -194,7 +233,7 @@ export const scanPrescription = createServerFn({ method: "POST" })
       }],
       tool_choice: { type: "function", function: { name: "extract_prescription" } },
     });
-    return parseToolCall(result);
+    return applyPrescriptionFallbacks(parseToolCall(result));
   });
 
 const symptomsSchema = {

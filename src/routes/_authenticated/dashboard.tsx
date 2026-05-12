@@ -1,9 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ScanLine, FileText, Mic, FileBarChart, History, ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
+
+function useFullName() {
+  const [name, setName] = useState<string>("");
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      const u = data.user;
+      const n = (u?.user_metadata?.full_name as string | undefined)
+        || (u?.email ? u.email.split("@")[0] : "");
+      setName(n);
+    });
+  }, []);
+  return name;
+}
 
 const TILES = [
   { to: "/scanner", title: "Scan Medicine", desc: "Read any English label", urdu: "دوا اسکین کریں", icon: ScanLine, color: "from-primary to-primary/70" },

@@ -56,6 +56,12 @@ function LoginPage() {
         <h1 className="text-2xl font-bold">Welcome back</h1>
         <p className="mt-1 text-sm text-muted-foreground">Sign in to your MediSnap account.</p>
 
+        {showSignupSuccess && (
+          <div className="mt-5 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm font-medium text-green-700 dark:text-green-400">
+            ✅ Account created successfully! Please login to continue.
+          </div>
+        )}
+
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>
             <label className="mb-1.5 block text-sm font-medium">Email</label>

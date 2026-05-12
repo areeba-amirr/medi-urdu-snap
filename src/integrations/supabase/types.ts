@@ -30,6 +30,7 @@ export type Database = {
           medicine_name: string | null
           medicine_name_urdu: string | null
           prescription_data: Json | null
+          scan_group_id: string | null
           scan_type: string
           user_id: string
           warnings: string | null
@@ -50,6 +51,7 @@ export type Database = {
           medicine_name?: string | null
           medicine_name_urdu?: string | null
           prescription_data?: Json | null
+          scan_group_id?: string | null
           scan_type?: string
           user_id: string
           warnings?: string | null
@@ -70,6 +72,7 @@ export type Database = {
           medicine_name?: string | null
           medicine_name_urdu?: string | null
           prescription_data?: Json | null
+          scan_group_id?: string | null
           scan_type?: string
           user_id?: string
           warnings?: string | null

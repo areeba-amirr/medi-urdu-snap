@@ -70,9 +70,13 @@ function PrescriptionPage() {
     setSaving(true);
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) { setSaving(false); return; }
+    const groupId = (typeof crypto !== "undefined" && "randomUUID" in crypto)
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const rows = result.medicines.map((m) => ({
       user_id: u.user!.id,
       scan_type: "prescription",
+      scan_group_id: groupId,
       medicine_name: m.name,
       medicine_name_urdu: m.name_urdu,
       dosage: m.dosage,

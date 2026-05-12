@@ -24,10 +24,14 @@ function LoginPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (signInError) {
+      setError(signInError.message);
+      return;
+    }
     toast.success("Welcome back!");
     navigate({ to: "/dashboard" });
   }

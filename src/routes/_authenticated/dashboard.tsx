@@ -28,10 +28,20 @@ const TILES = [
 ] as const;
 
 function Dashboard() {
+  const name = useFullName();
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Dashboard</h1>
-      <p className="mt-1 text-muted-foreground">Choose what you'd like to do.</p>
+      <div className="rounded-2xl border border-border bg-gradient-to-br from-primary/5 via-card to-card p-6 shadow-sm md:p-8">
+        <h1 className="text-2xl font-bold tracking-tight md:text-4xl">
+          Welcome back, <span className="text-primary">{name || "there"}</span>! 👋
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground md:text-base">{today}</p>
+        <p className="mt-3 text-base font-medium md:text-lg">Take care of your health today 💊</p>
+        <p className="urdu mt-1 text-base md:text-lg">آج اپنی صحت کا خیال رکھیں</p>
+      </div>
+
+      <h2 className="mt-8 text-xl font-bold md:text-2xl">What would you like to do?</h2>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         {TILES.map(({ to, title, desc, urdu, icon: Icon, color }) => (

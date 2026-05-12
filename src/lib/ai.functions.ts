@@ -49,6 +49,8 @@ const medicineSchema = {
     dosage_urdu: { type: "string" },
     frequency: { type: "string" },
     frequency_urdu: { type: "string" },
+    instructions: { type: "string" },
+    instructions_urdu: { type: "string" },
     warnings: { type: "string" },
     warnings_urdu: { type: "string" },
     food_interactions: { type: "string" },
@@ -57,11 +59,35 @@ const medicineSchema = {
   },
   required: [
     "medicine_name", "medicine_name_urdu", "dosage", "dosage_urdu",
-    "frequency", "frequency_urdu", "warnings", "warnings_urdu",
+    "frequency", "frequency_urdu", "instructions", "instructions_urdu",
+    "warnings", "warnings_urdu",
     "food_interactions", "food_interactions_urdu", "is_dangerous",
   ],
   additionalProperties: false,
 };
+
+const MEDICINE_TEXT_FIELDS = [
+  "medicine_name", "medicine_name_urdu",
+  "dosage", "dosage_urdu",
+  "frequency", "frequency_urdu",
+  "instructions", "instructions_urdu",
+  "warnings", "warnings_urdu",
+  "food_interactions", "food_interactions_urdu",
+] as const;
+
+function applyMedicineFallbacks(med: Record<string, any>) {
+  const out: Record<string, any> = { ...med };
+  for (const k of MEDICINE_TEXT_FIELDS) {
+    const v = out[k];
+    const empty = v === null || v === undefined ||
+      (typeof v === "string" && (v.trim() === "" ||
+        /^(not\s*specified|n\/?a|unknown|none)$/i.test(v.trim()) ||
+        v.trim() === "درج نہیں"));
+    if (empty) out[k] = k.endsWith("_urdu") ? "دستیاب نہیں" : "N/A";
+  }
+  out.is_dangerous = out.is_dangerous === true || String(out.is_dangerous).toLowerCase() === "true";
+  return out;
+}
 
 export const scanMedicine = createServerFn({ method: "POST" })
   .inputValidator((d: { imageBase64: string }) => z.object({ imageBase64: z.string().min(20) }).parse(d))

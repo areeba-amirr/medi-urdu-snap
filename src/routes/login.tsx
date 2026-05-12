@@ -6,21 +6,31 @@ import { Pill, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
+  validateSearch: (s: Record<string, unknown>) => ({ signup: s.signup === "success" ? "success" : undefined }),
   head: () => ({ meta: [{ title: "Login — MediSnap" }] }),
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { signup } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showSignupSuccess, setShowSignupSuccess] = useState(signup === "success");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard" });
     });
   }, [navigate]);
+
+  useEffect(() => {
+    if (signup !== "success") return;
+    setShowSignupSuccess(true);
+    const t = setTimeout(() => setShowSignupSuccess(false), 5000);
+    return () => clearTimeout(t);
+  }, [signup]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

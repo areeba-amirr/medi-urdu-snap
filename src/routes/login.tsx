@@ -6,21 +6,31 @@ import { Pill, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
+  validateSearch: (s: Record<string, unknown>) => ({ signup: s.signup === "success" ? "success" : undefined }),
   head: () => ({ meta: [{ title: "Login — MediSnap" }] }),
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { signup } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showSignupSuccess, setShowSignupSuccess] = useState(signup === "success");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/dashboard" });
     });
   }, [navigate]);
+
+  useEffect(() => {
+    if (signup !== "success") return;
+    setShowSignupSuccess(true);
+    const t = setTimeout(() => setShowSignupSuccess(false), 5000);
+    return () => clearTimeout(t);
+  }, [signup]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,6 +55,12 @@ function LoginPage() {
         </Link>
         <h1 className="text-2xl font-bold">Welcome back</h1>
         <p className="mt-1 text-sm text-muted-foreground">Sign in to your MediSnap account.</p>
+
+        {showSignupSuccess && (
+          <div className="mt-5 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm font-medium text-green-700 dark:text-green-400">
+            ✅ Account created successfully! Please login to continue.
+          </div>
+        )}
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>

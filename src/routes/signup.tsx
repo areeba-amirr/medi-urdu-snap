@@ -52,8 +52,8 @@ function SignupPage() {
       setError(signUpError.message);
       return;
     }
-    toast.success("Account created! Welcome to MediSnap.");
-    navigate({ to: "/dashboard" });
+    await supabase.auth.signOut();
+    navigate({ to: "/login", search: { signup: "success" } });
   }
 
   return (

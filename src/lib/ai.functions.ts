@@ -239,13 +239,14 @@ Extract EVERY medicine with name, dosage, frequency, duration, instructions (bef
 const symptomsSchema = {
   type: "object",
   properties: {
-    pain_level: { type: ["integer","null"], minimum: 0, maximum: 10 },
-    sleep_hours: { type: ["number","null"], minimum: 0, maximum: 24 },
-    mood: { type: ["string","null"], enum: ["happy","okay","sad", null] },
+    pain_level: { type: "integer", minimum: 1, maximum: 10 },
+    sleep_hours: { type: "number", minimum: 0, maximum: 24 },
+    mood: { type: "string", enum: ["happy","okay","sad"] },
     notes: { type: "string" },
     notes_urdu: { type: "string" },
   },
   required: ["pain_level","sleep_hours","mood","notes","notes_urdu"],
+  additionalProperties: false,
 };
 
 export const extractSymptoms = createServerFn({ method: "POST" })
@@ -253,21 +254,29 @@ export const extractSymptoms = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const result = await callAI({
       messages: [
-        { role: "system", content: "You are a medical assistant. The patient describes their day in English or Urdu. Extract pain (0-10), sleep hours, mood, and a clean summary. If a value isn't mentioned, use null." },
+        { role: "system", content: "You are a medical assistant. The patient describes their day in English or Urdu. Extract pain_level (1-10), sleep_hours (number), mood ('happy'|'okay'|'sad'), notes (English summary) and notes_urdu (Urdu summary). NEVER return null. If a value is unclear, use best guess: pain_level=5, sleep_hours=7, mood='okay'. Always provide both English and Urdu notes." },
         { role: "user", content: `Patient said: "${data.transcript}"` },
       ],
       tools: [{
         type: "function",
         function: {
           name: "extract_symptoms",
-          description: "Extract structured symptom data.",
+          description: "Extract structured symptom data with safe defaults.",
           parameters: symptomsSchema,
         },
       }],
       tool_choice: { type: "function", function: { name: "extract_symptoms" } },
     });
-    return parseToolCall(result);
+    const r = parseToolCall(result);
+    return {
+      pain_level: typeof r.pain_level === "number" ? r.pain_level : 5,
+      sleep_hours: typeof r.sleep_hours === "number" ? r.sleep_hours : 7,
+      mood: ["happy","okay","sad"].includes(r.mood) ? r.mood : "okay",
+      notes: r.notes || "",
+      notes_urdu: r.notes_urdu || "",
+    };
   });
+
 
 const interactionSchema = {
   type: "object",
